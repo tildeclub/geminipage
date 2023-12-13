@@ -1,0 +1,46 @@
+#!/bin/sh
+
+printf "20 text/gemini\r\n"
+
+cat <<EOF
+=> index.gmi    back to main index
+
+# Aggregated gemlog for all users of tilde.club
+
+While this is an aggregated gemlog for all users, this does not imply that it is also a list of all posts. For one thing, this aggregated gemlog only includes links that follow the gemini companion specification for subscribing to text/gemini pages. For another, it only includes links found in one of only a few prominent entry points that are suspected of containing gemlogs (such as the main index.gmi file of a capsule or a file called gemlog.gmi, for example). If you are a tilde.club user and your gemlog is not included in the list, please feel free to request its inclusion by sending an email to seifferth@tilde.club.
+
+EOF
+get() {
+grep \
+  '^=>[ ]\+[^ ]\+[ ]\+[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]' \
+  -s "$@" |
+    sed 's,\t, ,g;s, *$,,
+	 s,^/home/,,
+
+         # Link processing in sed can be quite messy; Hence the comments
+         # on this part of the script.
+         #
+         # Process absolute links containing a scheme and all
+         s,\([^/]\+\)/public_gemini/[^:]*:=> *\([a-z]\+://\),\1\t\2,
+         # Process absolute links that do not contain any scheme. This
+         # includes scheme-relative and site-relative links and should
+         # work fine in both cases.
+         s,\([^/]\+\)/public_gemini/[^:]*:=> */,\1\t/,
+         # Treat all remaining links as relative to the file’s location.
+         s,\([^/]\+\)/public_gemini/\([^:]*/\)\?[^:]*:=> *,\1\t/~\1/\2,
+
+         s,^\([^\t]\+\)\t\(.*\)$,\2\t\1,
+         s,^\([^ ]*\) \+\([0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]\)[ :-]*,\2\t\1  \2  ,'
+}
+( get \
+    /home/*/public_gemini/index.gmi \
+    /home/*/public_gemini/gemlog.gmi \
+    /home/*/public_gemini/blog.gmi \
+    /home/*/public_gemini/gemlog/index.gmi \
+    /home/*/public_gemini/gemlog/all.gmi \
+    /home/*/public_gemini/blog/index.gmi \
+    /home/*/public_gemini/blog/all.gmi \
+    /home/*/public_gemini/text/gemlog.gmi \
+    /home/*/public_gemini/journal/index.gmi \
+    /home/*/public_gemini/log/index.gmi
+) | sort -r | uniq | sed 's,^[^\t]\+\t,,;s,^\(.*\)\t\([^\t]*\)$,=> \1  (by ~\2),'

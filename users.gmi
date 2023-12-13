@@ -1,0 +1,19 @@
+#!/bin/sh
+
+printf "20 text/gemini\r\n"
+
+cat <<EOF
+=> index.gmi    back to main index
+
+# Users sorted alphabetically
+
+EOF
+
+for user in $(ls -d1 /home/*/public_gemini|sed 's,^/home/,,;s,/public_gemini$,,'); do
+  if ! cmp -s /etc/skel/public_gemini/index.gmi /home/$user/public_gemini/index.gmi; then
+    # Skip empty public_gemini directories
+    test $(find /home/$user/public_gemini -type f|head -n1|wc -l) -gt 0 || continue
+    # Print link
+    printf "=> gemini://tilde.club/~%s/ ~%s\n" "$user" "$user"
+  fi
+done

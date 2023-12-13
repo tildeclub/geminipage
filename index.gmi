@@ -2,23 +2,26 @@
 
 printf "20 text/gemini\r\n"
 
-printf "hello gemini!!\n"
-printf '```\n'
-cowsay WELCOME TO TILDE.CLUB A PLACE FOR WEBPAGES
-printf '```\n'
-printf "\n"
-printf "we're a a digital community for socializing, \n"
-printf "learning, and making cool stuff\n"
-printf "\n"
-printf "visit us in gopher and html lands for more info\n"
-printf "\n"
-printf "here are our esteemed users:\n"
-printf "if you're not appearing here, mkdir ~/public_gemini\n"
+cat <<EOF
+hello gemini!!
+$(printf '```')
+$(cowsay WELCOME TO TILDE.CLUB A PLACE FOR WEBPAGES)
+$(printf '```')
 
-for user in $(ls -d1 /home/*/public_gemini); do
-  user=$(stat -c '%U' $user)
-  if [[ -f /home/$user/public_gemini/index.gmi ]]; then
-    printf "=> gemini://tilde.club/~%s/ ~%s\n" "$user" "$user"
-  fi
-done
+We're a a digital community for socializing, learning, and making cool stuff. Visit us in gopher and html lands for more info.
 
+
+Here are some recent gemlog posts by our esteemed users:
+
+$(./gemlog.gmi | grep \
+  '^=>[ \t]\+[^ ]\+[ \t]\+[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]' |
+  head -n6)
+
+=> gemlog.gmi           See the complete list of aggregated gemlog posts
+
+
+To see a complete list of gemini users on this server, choose one of the following links:
+
+=> users.gmi            All gemini users (sorted alphabetically)
+=> users-lastmod.gmi    All gemini users (sorted by last modification of their gemini capsule)
+EOF

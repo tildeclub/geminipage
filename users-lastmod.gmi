@@ -1,0 +1,18 @@
+#!/bin/sh
+
+printf "20 text/gemini\r\n"
+
+cat <<EOF
+=> index.gmi    back to main index
+
+# Users sorted by last modification of their gemini capsule
+
+EOF
+
+for user in $(ls -d1 /home/*/public_gemini|sed 's,^/home/,,;s,/public_gemini$,,'); do
+  if ! cmp -s /etc/skel/public_gemini/index.gmi /home/$user/public_gemini/index.gmi; then
+    date="$(find "/home/$user/public_gemini" -type f -printf '%CF\n'|sort -r|head -n1)"
+    test "$date" || continue
+    printf "%s\t=> gemini://tilde.club/~%s/ ~%s\n" "$date" "$user" "$user"
+  fi
+done | sort -k1,1r | sed 's,^\([^\t]*\)\t\([^\t]*\)$,\2  (modified \1),'
