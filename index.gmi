@@ -15,6 +15,7 @@ Here are some recent gemlog posts by our esteemed users:
 
 $(./gemlog.gmi | grep \
   '^=>[ \t]\+[^ ]\+[ \t]\+[0-9][0-9][0-9][0-9]-[0-9][0-9]-[0-9][0-9]' |
+  awk 'i[$NF]++ < 1' |
   head -n6)
 
 => gemlog.gmi           See the complete list of aggregated gemlog posts

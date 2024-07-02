@@ -1,0 +1,2 @@
+#!/bin/sh
+printf "%s %s\r\n" 31 /
